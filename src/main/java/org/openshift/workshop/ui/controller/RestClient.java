@@ -46,9 +46,9 @@ public class RestClient {
     
     private static String buildBaseURL() {
         
-        String base = System.getProperty("REST_PROTOCOL", "http") + "://" + System.getProperty("REST_HOST", "spring-boot-cxf-jaxrs") + ":" +  System.getProperty("REST_PORT", "8080");
+        return System.getProperty("REST_PROTOCOL", "http") + "://" + System.getProperty("REST_HOST", "spring-boot-cxf-jaxrs") + ":" +  System.getProperty("REST_PORT", "8080");
         
-        return "http://spring-boot-cxf-jaxrs-sample.apps.na1.openshift.opentlc.com";
+//        return "http://spring-boot-cxf-jaxrs-sample.apps.na1.openshift.opentlc.com";
     }
 
     public static List<StockPrice> loadMarketData(final List<StockPrice> items) {
