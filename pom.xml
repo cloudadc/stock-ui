@@ -30,19 +30,15 @@
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
             <version>${version.cdi-api}</version>
+            <scope>provided</scope>
         </dependency>
 
 	    <dependency>
             <groupId>org.jboss.spec.javax.faces</groupId>
             <artifactId>jboss-jsf-api_2.2_spec</artifactId>
             <version>${version.jboss-jsf-api}</version>
+            <scope>provided</scope>
          </dependency>
-         
-         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-rs-client</artifactId>
-            <version>${cxf.version}</version>
-        </dependency>
         
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

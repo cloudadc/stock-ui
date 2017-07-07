@@ -39,8 +39,8 @@ public class RestController {
     
     @PostConstruct
     public void invokeRest() {
-        CXFClient.loadProduct(products);
-        CXFClient.loadMarketData(stockPrices);
-        CXFClient.loadStocks(stocks);
+        RestClient.loadProduct(products);
+        RestClient.loadMarketData(stockPrices);
+        RestClient.loadStocks(stocks);
     }
 }
