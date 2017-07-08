@@ -3,6 +3,7 @@ package org.openshift.workshop.ui.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -13,6 +14,12 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.openshift.api.model.Route;
+import io.fabric8.openshift.api.model.RouteList;
+import io.fabric8.openshift.client.OpenShiftClient;
+
 @SuppressWarnings("unchecked")
 public class RestClient {
     
@@ -21,6 +28,9 @@ public class RestClient {
     private static String API_PRODUCT = BASE + "/rest/query/account/products";
     private static String API_MARKETDATA = BASE + "/rest/query/marketData/stockPrices";
     private static String API_STOCKS= BASE + "/rest/query/stocks";
+    
+    private static final String STOCKS_BACKEND_LABEL_K = "type";
+    private static final String STOCKS_BACKEND_LABEL_V = "stocks-backend";
     
     
     public static List<Product> loadProduct(final List<Product> items) {
@@ -46,13 +56,35 @@ public class RestClient {
     
     private static String buildBaseURL() {
         
-        String baseUrl = System.getProperty("REST_PROTOCOL", "http") + "://" + System.getProperty("REST_HOST", "spring-boot-cxf-jaxrs") + ":" +  System.getProperty("REST_PORT", "8080");
+        KubernetesClient kc = new DefaultKubernetesClient();
+        OpenShiftClient client = kc.adapt(OpenShiftClient.class);
+        RouteList routes = client.routes().list();
         
+        System.out.println("MasterUrl: " + kc.getMasterUrl());
+        System.out.println("Project Name: " + kc.getNamespace());
+        
+        String backendRoute = System.getProperty("BACKEND_ROUTE", "spring-boot-cxf-jaxrs");
+        
+        List<Route> result = null;
+        result = routes.getItems().stream().filter(r -> r.getMetadata().getName().equals(backendRoute)).collect(Collectors.toList());
+        
+        if(result == null || result.size() == 0) {
+            result = routes.getItems().stream().filter(r -> r.getMetadata().getLabels().get(STOCKS_BACKEND_LABEL_K) != null && r.getMetadata().getLabels().get(STOCKS_BACKEND_LABEL_K).equals(STOCKS_BACKEND_LABEL_V)).collect(Collectors.toList());
+        }
+        
+        String baseUrl = System.getProperty("REST_PROTOCOL", "http") + "://";
+        if(result != null && result.size() > 0) {
+            baseUrl += result.get(0).getSpec().getHost();
+        } else {
+            baseUrl += (System.getProperty("REST_HOST", "spring-boot-cxf-jaxrs") + ":" +  System.getProperty("REST_PORT", "8080"));
+        }
+
         System.out.println("BaseURL: " + baseUrl);
+ 
+        kc.close();
         
         return baseUrl ;
         
-//        return "http://spring-boot-cxf-jaxrs-sample.apps.na1.openshift.opentlc.com";
     }
 
     public static List<StockPrice> loadMarketData(final List<StockPrice> items) {
