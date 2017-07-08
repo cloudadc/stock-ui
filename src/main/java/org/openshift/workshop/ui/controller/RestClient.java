@@ -46,7 +46,11 @@ public class RestClient {
     
     private static String buildBaseURL() {
         
-        return System.getProperty("REST_PROTOCOL", "http") + "://" + System.getProperty("REST_HOST", "spring-boot-cxf-jaxrs") + ":" +  System.getProperty("REST_PORT", "8080");
+        String baseUrl = System.getProperty("REST_PROTOCOL", "http") + "://" + System.getProperty("REST_HOST", "spring-boot-cxf-jaxrs") + ":" +  System.getProperty("REST_PORT", "8080");
+        
+        System.out.println("BaseURL: " + baseUrl);
+        
+        return baseUrl ;
         
 //        return "http://spring-boot-cxf-jaxrs-sample.apps.na1.openshift.opentlc.com";
     }
